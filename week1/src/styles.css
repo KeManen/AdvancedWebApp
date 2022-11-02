@@ -1,3 +1,38 @@
 body {
 	font-family: sans-serif;
 }
+
+.wiki-img {
+	height: auto;
+	max-width: 100%;
+}
+
+.wiki-item {
+	margin-left: 10px;
+	margin-right: 10px;
+	box-shadow: 10px 10px #888;
+}
+
+.wiki-content {
+	padding: 10px;
+}
+
+@media only screen and (min-width: 600px) {
+	.wiki-content{
+		display: flex;
+		flex-flow: row-reverse;
+	}
+	.wiki-text{
+		min-width: 50%;
+		max-width: 50%;
+	}
+	.img-content {
+		min-width: 50%;
+		max-width: 50%;
+	}
+
+	.container{
+		max-width: 960px;
+		margin:  0 auto;
+	}
+}

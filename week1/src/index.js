@@ -1,19 +1,18 @@
-import "./styles.css";
-
-window.onload = () => {	
-	fetch("https://dog.ceo/api/breeds/list").then((res) => res.json()).then((data)=>console.log(data));
-	
-	/*
-	dogs.forEach((breed) => {
-		let image = fetch(`https://dog.ceo/api/breed/${breed}/images/random`);
-		let wikitext = fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${breed}`).then((res=> res.json)).extract;
+if(document.readyState !== "loading") init()
+else document.addEventListener("DOMContentLoaded", init)
 
 
-	}
-	);
-	*/
-	
-	
+function init (){
+	fetch("https://dog.ceo/api/breeds/list")
+		.then((res) => res.json())
+		.then(async (data)=>{
+			let dogs = data.message.splice(0,5)
+			for (let breed of dogs) {
+				let image = await fetch(`https://dog.ceo/api/breed/${breed}/images/random`).then((res)=>res.json());
+				let wikiJson = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${breed}`).then((res)=> res.json());
+				createWikiElement(breed, wikiJson['extract'], image.message);
+			}
+		}).catch(err => console.log(err));
 }
 
 function createWikiElement(headerText, wikiText, imageSrc){
@@ -31,15 +30,15 @@ function createWikiElement(headerText, wikiText, imageSrc){
 	imgcontainer.className="img-container";
 	img.className="wiki-img";
 	
-	header.innerHtml = headerText;
-	text.innerHtml = wikiText;
+	header.innerHTML = headerText;
+	text.innerHTML = wikiText;
 	img.src = imageSrc;
 
 	item.appendChild(header);
 	item.appendChild(content);
 	content.appendChild(text);
 	content.appendChild(imgcontainer);
-	container.appendChild(img);
+	imgcontainer.appendChild(img);
 
 	document.getElementById("app").appendChild(item);
 }
