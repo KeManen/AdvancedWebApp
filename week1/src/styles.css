@@ -3,8 +3,7 @@ body {
 }
 
 .wiki-img {
-	height: auto;
-	max-width: 100%;
+	width: 100%;
 }
 
 .wiki-item {
@@ -17,22 +16,22 @@ body {
 	padding: 10px;
 }
 
-@media only screen and (min-width: 600px) {
-	.wiki-content{
+@media screen and (min-width: 600px) {
+	.wiki-content {
 		display: flex;
 		flex-flow: row-reverse;
 	}
-	.wiki-text{
+	.wiki-text {
 		min-width: 50%;
 		max-width: 50%;
 	}
-	.img-content {
+	.img-container {
 		min-width: 50%;
 		max-width: 50%;
 	}
 
-	.container{
+	.container {
 		max-width: 960px;
-		margin:  0 auto;
+		margin: 0 auto;
 	}
 }
