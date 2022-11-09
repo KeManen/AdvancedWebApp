@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({extended:true}))
 
 
-app.use('/', express.static('static'));
+app.use(express.static('static'));
 
 app.get("/hello", (req, res) => res.json({msg:"Hello World"}) )
 app.get("/echo/:id", (req, res) => res.json({id:req.params.id.toString()}))
