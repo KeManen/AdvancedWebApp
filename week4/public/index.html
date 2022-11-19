@@ -1,13 +1,38 @@
-<html>
+<html lang="en">
 
 <head>
   <title>Express</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link type="text/css" rel="stylesheet" href="/stylesheets/materialize.min.css"  media="screen,projection"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  
   <link rel="stylesheet" href="/stylesheets/style.css">
+  <script src="/javascripts/index.js" defer></script>
 </head>
 
 <body>
-  <h1>Express</h1>
-  <p>Welcome to Express</p>
+  <div class="nav-wrapper"></div>
+  <div id="container" class="container">
+    <div id="add-recipe" class="col" >
+      <h4>Name</h4>
+      <input type="text" id="name-text" class="input">
+      <h4>Ingredients</h4>
+      <textarea id="ingredients-text" class="input"></textarea>
+      <button id="add-ingredient" type="button" class="btn">Add ingredient</button>
+      <h4>instructions</h4>
+      <textarea id="instructions-text" class="input"></textarea>
+      <button id="add-instruction" type="button" class="btn">Add instruction</button>
+      <input id="image-input" type="file" accept="/image/*" multiple class="input"></input>
+      <button id="submit" type="submit" class="btn">Submit</button>
+    </div>
+    <div id="view-recipe" class="col">
+      <h1 id="recipe-name"></h1>
+      <ul id="recipe-ingredients"></ul>
+      <ul id="recipe-instructions"></ul>
+    </div>
+  </div>
+  
+  <script type="text/javascript" src="javascripts/materialize.min.js"></script>
 </body>
 
 </html>
