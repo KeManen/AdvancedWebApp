@@ -1,0 +1,106 @@
+extends layout
+
+block content
+  #message
+  p Insert to todos
+  label(for='input-name') Insert name
+  textarea(id='input-name')
+  label(for='input-task') Insert task
+  textarea(id='input-task')
+  button(id='submit-data') Submit
+  p Or search for todos
+  label(for='search-name') Search for name
+  textarea(id='search-name' name='name')
+  button(id='search' content="Search") Search
+  #todo(hidden=true)
+    p(id='todoP')
+    ul(id="todos")
+    button(id='delete-user') Delete user
+
+
+  script.
+    let messageField = document.getElementById("message");
+    let inputName = document.getElementById("input-name");
+    let inputTask = document.getElementById("input-task");
+    let todoP = document.getElementById("todoP");
+    let todoDiv = document.getElementById("todo");
+    let todoUl = document.getElementById("todos")
+    let deleteUser = document.getElementById("delete-user");
+
+    document.addEventListener('click', (event) => {
+      if(event.target.id === "submit-data"){
+        fetch('/todo', {
+            method:'post',
+            headers: {
+              'Charset': 'UTF-8',
+              'Content-Type': 'application/json'
+            },
+            body:JSON.stringify({
+              name: inputName.value,
+              task: inputTask.value,
+            }),
+        }).then(res => res.text())
+          .then(res => messageField.innerHTML =res)
+          .catch(err => console.error(err))
+
+      } else if (event.target.id === "search"){
+        fetch(`/user/${document.getElementById("search-name").value}`, {
+          method: 'get',
+          headers: {
+            'Charset': 'UTF-8',
+            'Content-Type': 'application/json'
+          }
+        }).then(res => res.json())
+          .then(json =>{
+            let user = json.user
+            if(user == null) {
+              messageField.innerHTML = json.error;
+              disableTodoView();
+            }
+            else todoDiv.hidden ? enableTodoView(user): disableTodoView();
+          })
+          .catch(err => console.error(err));
+      }
+    })
+
+    function enableTodoView(user){
+      todoDiv.hidden = false;
+      deleteUser.disabled = false;
+      todoP.innerText = ` ${user.name} todos`
+      deleteUser.addEventListener('click', () => {
+        console.log(user.name);
+        fetch(`/user/${user.name}`, {method: 'DELETE'})
+                .then(res => res.text())
+                .then(res => document.getElementById("message").innerHTML = res)
+                .then(disableTodoView)
+                .catch(err => console.error(err))
+      })
+
+      user.tasks.forEach(todoText => {
+        let li = document.createElement('li')
+        li.innerHTML = todoText;
+        li.classList.add('delete-task')
+        li.addEventListener('click', () => fetch('/user', {
+          method: "PUT",
+          headers: {
+            'Charset': 'UTF-8',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name: user.name,
+            todo: todoText,
+          })
+        }).then(res => res.text())
+          .then(res => document.getElementById("message").innerHTML = res)
+          .catch(err => console.error(err))
+        )
+
+        todoUl.appendChild(li)
+      })
+    }
+
+    function disableTodoView(){
+      todoDiv.hidden = true;
+      deleteUser.disabled = true;
+      todoUl.innerHTML ="";
+    }
