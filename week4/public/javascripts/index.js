@@ -8,6 +8,9 @@ let instructionsText = document.getElementById("instructions-text");
 
 let imageInput = document.getElementById("image-input");
 
+let pInstructions = document.getElementById("pInstructions");
+let pIngredients = document.getElementById("pIngredients");
+
 let instructionStorage = [];
 let ingredientsStorage = [];
 
@@ -18,7 +21,7 @@ fetch('/recipe/sustenance')
         recipeName.innerHTML = json.name;
         json.ingredients.forEach(value =>{
             let li = document.createElement('li');
-            li.innerHTML =value;
+            li.innerHTML = value;
             recipeIngredients.appendChild(li);
         })
         json.instructions.forEach(value =>{
@@ -31,14 +34,26 @@ fetch('/recipe/sustenance')
 
 document.getElementById("submit").addEventListener('click', () =>{
     let formData = new FormData();
-    formData["images"] = imageInput.files;
+    for(let i =0; i< imageInput.files.length; i++){
+        formData.append("images", imageInput.files[i])
+    }
+
+    console.log(formData)
     fetch('/images', {
-        method: 'post',
+        method: 'POST',
         body: formData,
     }).catch(err => console.error(err));
 
-    fetch('/recipe', {
-        method: 'post',
+    console.log({
+        name: nameText.value,
+        ingredients: ingredientsStorage,
+        instructions: instructionStorage
+    })
+    fetch('/recipe/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
         body: JSON.stringify({
             name: nameText.value,
             ingredients: ingredientsStorage,
@@ -50,9 +65,12 @@ document.getElementById("submit").addEventListener('click', () =>{
 document.getElementById("add-ingredient").addEventListener('click', () => {
     ingredientsStorage.push(ingredientsText.value);
     ingredientsText.value = "";
+    pIngredients.innerText = ingredientsStorage.toString();
+
 })
 
 document.getElementById("add-instruction").addEventListener('click', () => {
     instructionStorage.push(instructionsText.value);
     instructionsText.value ="";
+    pInstructions.innerText = instructionStorage.toString();
 })

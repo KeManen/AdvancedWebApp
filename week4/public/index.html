@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -11,18 +12,23 @@
 </head>
 
 <body>
-  <div class="nav-wrapper"></div>
+  <nav>
+    <div class="nav-wrapper"></div>
+  </nav>
+
   <div id="container" class="container">
     <div id="add-recipe" class="col" >
       <h4>Name</h4>
-      <input type="text" id="name-text" class="input">
+      <label for="name-text">Name</label><input type="text" id="name-text" class="input">
       <h4>Ingredients</h4>
-      <textarea id="ingredients-text" class="input"></textarea>
+      <p id="pIngredients"></p>
+      <label for="ingredients-text">Ingredients</label><textarea id="ingredients-text" class="input"></textarea>
       <button id="add-ingredient" type="button" class="btn">Add ingredient</button>
       <h4>instructions</h4>
-      <textarea id="instructions-text" class="input"></textarea>
+      <p id="pInstructions"></p>
+      <label for="instructions-text">Instructions</label><textarea id="instructions-text" class="input"></textarea>
       <button id="add-instruction" type="button" class="btn">Add instruction</button>
-      <input id="image-input" type="file" accept="/image/*" multiple class="input"></input>
+      <input id="image-input" type="file" accept="/image/*" multiple class="input">
       <button id="submit" type="submit" class="btn">Submit</button>
     </div>
     <div id="view-recipe" class="col">
@@ -31,7 +37,7 @@
       <ul id="recipe-instructions"></ul>
     </div>
   </div>
-  
+
   <script type="text/javascript" src="javascripts/materialize.min.js"></script>
 </body>
 
