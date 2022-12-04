@@ -8,11 +8,13 @@ const indexRouter = require('./routes');
 const app = express();
 
 const mongoDB = "mongodb://localhost:27017/testdb"
-mongoose.connect(mongoDB);
-mongoose.Promise = Promise;
+mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
+
+// Get the default connection
 const db = mongoose.connection;
 
-db.on("error", console.error.bind(console, "MongoDB connection error"));
+// Bind connection to error event (to get notification of connection errors)
+db.on("error", console.error.bind(console, "MongoDB connection error:"));
 
 app.use(logger('dev'));
 app.use(express.json());

@@ -1,10 +1,13 @@
 const express = require('express');
-const {Recipe} = require("../models/recipe");
-const {Category} = require("../models/category")
-const {Image} = require("../models/images")
+
+const Recipe = require("../models/recipe");
+const Category = require("../models/category")
+const Image = require("../models/images")
+
 const router = express.Router();
 const multer = require('multer');
-const upload = multer({dest:'uploads/'});
+const storage = multer.memoryStorage();
+const upload = multer({storage:storage});
 
 /* GET home page. */
 router.get('/', function(req, res) {
@@ -12,54 +15,68 @@ router.get('/', function(req, res) {
 });
 
 router.get('/recipe/:id',(req, res, next) =>
-  Recipe.findById(req.params.id, (err, recipe) => {
+  Recipe.findOne({name:req.params.id}, null, null, (err, recipe) => {
     if(err) {
       if(err.name === "CastError") return res.status(404).send(`Recipe ${req.params.id} not found!`)
-      return next(err)
+      else return next(err)
     }
-    if(!recipe) return res.status(404).send(`Recipe ${req.params.id} not found!`)
-    else {
-      res.send(recipe);
-    }
-  }))
+    if(!recipe) return res.status(404).send(`Recipe ${req.params.id} not found!`);
+
+    res.send(recipe);
+
+  })
+)
 
 
 router.post('/recipe/', (req, res, next) =>
-  Recipe.findOne({name: req.body.name }, (err, recipe) => {
-    if(err) return next(err);
-    if(!recipe){
-      new Recipe({
-        name:req.body.name,
-        ingredients:req.body.ingredients,
-        instructions:req.body.instructions,
-        categories:req.body.categories,
-      }).save(err => {
-        if(err) return next(err);
-        return res.send(req.body);
-      });
-    } else return res.status(403).send("Already has that recipe!");
-  }));
+  Recipe.findOne({name: req.body.name }, null, null, (err, recipe) => {
+      if (err) return next(err);
+      if (recipe) return res.status(404).send("Already has that recipe!");
 
-router.get('/categories/', async (req, res, next) => {
-    Category.find({}, (err, categories) => {
-        if(err) return next(err)
-        if(categories.any()) res.send(categories);
-        else return res.status(404).send("There are no categories");
+
+      Category.find({name: {$in: req.body.categories}}, null, null, (err, category) => {
+          if (err) return res.next(err)
+          if (!category) return res.next(err);
+          let ids = []
+          category.forEach(categoryObject => ids.push(categoryObject._id));
+
+          new Recipe({
+              name: req.body.name,
+              ingredients: req.body.ingredients,
+              instructions: req.body.instructions,
+              categories: ids,
+          }).save(err => {
+              if (err) return next(err);
+              return res.send(req.body);
+          });
+      });
+  })
+);
+
+router.get('/categories/', (req, res, next) => {
+    Category.find({}, null, null, (err, categories) => {
+        if(err) return next(err);
+        if(!categories) return next(err);
+        if(categories.length === 0) return res.status(404).send("There are no categories");
+
+        res.send(categories);
     });
 });
 
-router.post('/images', upload.array('images', 12), (req, res, next) =>{
-    Recipe.findOne({name:req.body.recipe}, (err, recipe) =>{
+router.post('/images/', upload.array('images', 12), (req, res, next) =>{
+
+    Recipe.findOne({name:req.body.recipe}, null, null, (err, recipe) =>{
         if(err) return next(err);
         if(!recipe) return res.status(404).send("Couldn't find a recipe with name "+ req.body.recipe);
 
         req.files.forEach(image => {
             let dbImage = new Image({
-                name: image.filename,
+                name: image.originalname,
                 encoding: image.encoding,
-                mimetype: image.type,
+                mimetype: image.mimetype,
                 buffer: image.buffer,
-            }).save(err => {
+            });
+            dbImage.save(err => {
                 if (err) return next(err);
             })
 
@@ -69,23 +86,23 @@ router.post('/images', upload.array('images', 12), (req, res, next) =>{
         recipe.save();
     });
 
-
-    console.log(req.files)
     res.send("Hi :]");
 })
 
-router.get('images/:imageId', (req, res, next) => {
-    Image.findById(req.params.imageId, (err, image) => {
+router.get('/images/:imageId', (req, res, next) => {
+    Image.findById(req.params.imageId, null, null, (err, image) => {
         if(err) return next(err);
-        if(image.any()){
-            res.set({
-                'Content-Type':image.mimetype,
-                'Content-Disposition':'inline',
-            });
-           res.send(image);
-        }
-        else return res.status(404).send("There are no images");
+        if(image.length === 0) return res.status(404).send("There are no images");
+        res.set({
+            'Content-Type':image.mimetype,
+            'Content-Disposition':'inline',
+        });
+        res.send(image);
     });
-})
+});
+
+function errorHandler(err){
+    console.log(err);
+}
 
 module.exports = router;

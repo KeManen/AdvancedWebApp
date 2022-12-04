@@ -20,27 +20,18 @@ let instructionStorage = [];
 let ingredientsStorage = [];
 
 document.getElementById("submit").addEventListener('click', () =>{
-    let formData = new FormData();
-    formData.set("recipe", nameText.value)
-    for(let i =0; i< imageInput.files.length; i++){
-        formData.append("images", imageInput.files[i])
+    let categories = []
+    for (const child of categoriesDiv.children){
+        let input = child.getElementsByTagName("input")[0]
+        if(input.checked) categories.push(input.id)
     }
 
-    console.log(formData)
-    fetch('/images', {
-        method: 'POST',
-        body: formData,
-    }).catch(errorHandler);
 
     let recipe = {
         name: nameText.value,
         ingredients: ingredientsStorage,
         instructions: instructionStorage,
-        categories:[]
-    }
-
-    for (let child of categoriesDiv.children){
-        if(child.checked) recipe.categories.push(child.id)
+        categories:categories
     }
 
     console.log(recipe);
@@ -51,6 +42,18 @@ document.getElementById("submit").addEventListener('click', () =>{
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(recipe),
+    }).then(() => {
+        let formData = new FormData();
+        formData.set("recipe", nameText.value)
+        for(let i =0; i< imageInput.files.length; i++){
+            formData.append("images", imageInput.files[i])
+        }
+
+        console.log(formData)
+        fetch('/images', {
+            method: 'POST',
+            body: formData,
+        }).catch(errorHandler);
     }).catch(errorHandler)
 })
 
@@ -79,6 +82,8 @@ document.getElementById("search").addEventListener('keypress', ev => {
 
 function setShowedRecipe(json) {
     recipeName.innerHTML = json.name;
+    recipeIngredients.innerHTML = '';
+    recipeInstructions.innerHTML = '';
     json.ingredients.forEach(value => {
         let li = document.createElement('li');
         li.innerHTML = value;
@@ -105,16 +110,24 @@ function errorHandler(err) {
 
 function init(){
     fetch('/recipe/sustenance')
+        .then(res => {console.log(res);return res;})
         .then(res => res.json())
         .then(setShowedRecipe)
         .catch(errorHandler);
 
     fetch('/categories/').then(res => res.json()).then(json => {
         json.forEach(category => {
+            let label = document.createElement("label")
+            categoriesDiv.appendChild(label);
+
             let checkbox = document.createElement("input")
             checkbox.type = "checkbox";
-            checkbox.id = category;
-            categoriesDiv.appendChild(checkbox);
+            checkbox.id = category.name;
+            label.appendChild(checkbox)
+
+            let span = document.createElement("span");
+            span.innerHTML = category.name;
+            label.appendChild(span)
         })
 
     }).catch(errorHandler);
