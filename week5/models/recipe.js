@@ -1,12 +1,19 @@
-class Recipe {
-    constructor(name = "sustenance", ingredients = ["stuff", "things"], instructions = ["preparing", "cooking"]) {
-        this.name = name;
-        this.ingredients = ingredients;
-        this.instructions = instructions;
-    }
-}
-const RecipeStorage = {
-    sustenance: new Recipe(),
-};
+const mongoose = require("mongoose");
 
-module.exports = {Recipe, RecipeStorage};
+const Schema = mongoose.Schema;
+
+let recipeSchema = new Schema ({
+    name: String,
+    ingredients:String,
+    instructions: String,
+    categories:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category',
+    }],
+    images: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Images',
+    }]
+})
+
+module.exports = mongoose.model("Recipe", recipeSchema)

@@ -13,7 +13,9 @@
 
 <body>
   <nav>
-    <div class="nav-wrapper"></div>
+    <div class="nav-wrapper">
+      <input type="search" id="search">
+    </div>
   </nav>
 
   <div id="container" class="container">
@@ -28,13 +30,19 @@
       <p id="pInstructions"></p>
       <label for="instructions-text">Instructions</label><textarea id="instructions-text" class="input"></textarea>
       <button id="add-instruction" type="button" class="btn">Add instruction</button>
-      <input id="image-input" type="file" accept="/image/*" multiple class="input">
+      <input id="camera-image-input" type="file" accept="/image/*" multiple class="input">
+      <div id="categories">
+        <label>Categories</label>
+      </div>
       <button id="submit" type="submit" class="btn">Submit</button>
     </div>
     <div id="view-recipe" class="col">
       <h1 id="recipe-name"></h1>
       <ul id="recipe-ingredients"></ul>
       <ul id="recipe-instructions"></ul>
+      <div id="images">
+
+      </div>
     </div>
   </div>
 

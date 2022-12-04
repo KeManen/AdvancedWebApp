@@ -1,10 +1,18 @@
-let express = require('express');
-let path = require('path');
-let logger = require('morgan');
+const express = require('express');
+const path = require('path');
+const logger = require('morgan');
+const mongoose = require("mongoose");
 
-let indexRouter = require('./routes');
+const indexRouter = require('./routes');
 
-let app = express();
+const app = express();
+
+const mongoDB = "mongodb://localhost:27017/testdb"
+mongoose.connect(mongoDB);
+mongoose.Promise = Promise;
+const db = mongoose.connection;
+
+db.on("error", console.error.bind(console, "MongoDB connection error"));
 
 app.use(logger('dev'));
 app.use(express.json());

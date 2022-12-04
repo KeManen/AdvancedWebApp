@@ -1,59 +1,91 @@
 const express = require('express');
-const {RecipeStorage, Recipe} = require("../models/recipe");
+const {Recipe} = require("../models/recipe");
+const {Category} = require("../models/category")
+const {Image} = require("../models/images")
 const router = express.Router();
 const multer = require('multer');
-const upload = multer();
+const upload = multer({dest:'uploads/'});
 
 /* GET home page. */
 router.get('/', function(req, res) {
   res.render('index', { title: 'Express' });
 });
 
-router.post('/images', upload.array('images'), (req, res) =>{
-  let images = req.files.images;
-  console.log(req.files)
-  res.send("Hi :]");
-})
+router.get('/recipe/:id',(req, res, next) =>
+  Recipe.findById(req.params.id, (err, recipe) => {
+    if(err) {
+      if(err.name === "CastError") return res.status(404).send(`Recipe ${req.params.id} not found!`)
+      return next(err)
+    }
+    if(!recipe) return res.status(404).send(`Recipe ${req.params.id} not found!`)
+    else {
+      res.send(recipe);
+    }
+  }))
 
-router.get('/recipe/:id', (req, res) => {
-  let name = req.params.id;
-  let recipe = RecipeStorage[name];
-  console.log(recipe)
-  if(recipe == null) return res.json({
-    name:name,
-    ingredients:["undefined"],
-    instructions:["undefined"],
-  })
 
-  let ingredients = RecipeStorage[name].ingredients;
-  let instructions = RecipeStorage[name].instructions;
-  if(ingredients == null) ingredients = ["undefined"];
-  if(instructions == null) instructions = ["undefined"];
+router.post('/recipe/', (req, res, next) =>
+  Recipe.findOne({name: req.body.name }, (err, recipe) => {
+    if(err) return next(err);
+    if(!recipe){
+      new Recipe({
+        name:req.body.name,
+        ingredients:req.body.ingredients,
+        instructions:req.body.instructions,
+        categories:req.body.categories,
+      }).save(err => {
+        if(err) return next(err);
+        return res.send(req.body);
+      });
+    } else return res.status(403).send("Already has that recipe!");
+  }));
 
-  res.json({
-    name:name,
-    ingredients:ingredients,
-    instructions:instructions,
-  });
+router.get('/categories/', async (req, res, next) => {
+    Category.find({}, (err, categories) => {
+        if(err) return next(err)
+        if(categories.any()) res.send(categories);
+        else return res.status(404).send("There are no categories");
+    });
 });
 
-router.post('/recipe/', (req, res) =>{
-  console.log("recipe")
-  console.log(req.body)
-  let recipe = new Recipe(
-      req.body.name,
-      req.body.ingredients,
-      req.body.instructions,
-  )
-  console.log(recipe)
-  console.log(RecipeStorage)
-  RecipeStorage[recipe.name] = recipe;
-  console.log(RecipeStorage)
-  res.json({
-    name:recipe.name,
-    ingredients:recipe.ingredients,
-    instructions:recipe.instructions,
-  });
+router.post('/images', upload.array('images', 12), (req, res, next) =>{
+    Recipe.findOne({name:req.body.recipe}, (err, recipe) =>{
+        if(err) return next(err);
+        if(!recipe) return res.status(404).send("Couldn't find a recipe with name "+ req.body.recipe);
+
+        req.files.forEach(image => {
+            let dbImage = new Image({
+                name: image.filename,
+                encoding: image.encoding,
+                mimetype: image.type,
+                buffer: image.buffer,
+            }).save(err => {
+                if (err) return next(err);
+            })
+
+            recipe.images.push(dbImage._id);
+        });
+
+        recipe.save();
+    });
+
+
+    console.log(req.files)
+    res.send("Hi :]");
+})
+
+router.get('images/:imageId', (req, res, next) => {
+    Image.findById(req.params.imageId, (err, image) => {
+        if(err) return next(err);
+        if(image.any()){
+            res.set({
+                'Content-Type':image.mimetype,
+                'Content-Disposition':'inline',
+            });
+           res.send(image);
+        }
+        else return res.status(404).send("There are no images");
+    });
 })
 
 module.exports = router;
