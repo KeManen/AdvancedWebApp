@@ -3,10 +3,14 @@ import createError from 'http-errors';
 import express, { RequestHandler, ErrorRequestHandler  } from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
+import bodyParser from 'body-parser';
 import logger from 'morgan';
+import session from 'express-session';
+import passport from 'passport-local';
 
 import indexRouter from './routes/index';
-import usersRouter from './routes/users';
+import apiRouter from './routes/api';
+
 
 class App {
   public app: express.Application;
@@ -21,18 +25,23 @@ class App {
   private config() {
     // view engine setup
     this.app.set('views', path.join(__dirname, 'views'));
-    this.app.set('view engine', 'jade');
 
     this.app.use(logger('dev'));
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: false }));
+    this.app.use(bodyParser.json());
     this.app.use(cookieParser());
     this.app.use(express.static(path.join(__dirname, 'public')));
+    this.app.use(session({
+      secret: 'secretSauce',
+      saveUninitialized : false,
+      resave: true,
+    }));
   }
 
   private routerSetup() {
     this.app.use('/', indexRouter);
-    this.app.use('/users', usersRouter);
+    this.app.use('/api', apiRouter);
   }
 
   private errorHandler() {
