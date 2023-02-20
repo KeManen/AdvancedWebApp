@@ -3,9 +3,13 @@ import React from 'react';
 function BookSender() {
     function sendHandler(e){
         e.preventDefault();
-        const formData = new FormData(e.target);
-        console.log(formData);
-        fetch('/api/books', {method: e.target.method, body: formData})
+        const data = {
+            "name":e.target.name.value,
+            "author":e.target.author.value,
+            "pages":e.target.pages.value            
+        };
+        console.log(data);
+        fetch('/api/book', {method: e.target.method, headers: { 'Content-Type': 'application/json' }, mode:"cors", body: JSON.stringify(data)})
         .catch(err => console.log(err));
     }
 
