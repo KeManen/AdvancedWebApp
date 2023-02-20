@@ -8,6 +8,19 @@ var app = require('../app');
 var debug = require('debug')('server:server');
 var http = require('http');
 
+
+require("dotenv").config();
+console.log(process.env.MONGODB_URI)
+/**
+ * Get mongo connection 
+ */
+
+const mongoose = require('mongoose');
+mongoose.set('strictQuery', false);
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27027", {useNewUrlParser: true, useUnifiedTopology: true});
+
+
+
 /**
  * Get port from environment and store in Express.
  */
