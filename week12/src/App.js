@@ -11,8 +11,8 @@ function App() {
       <div className="App">
         <Header />
         <Routes>
-          <Route exact path="/" element={MyContainer()} />
-          <Route path="/about" element={About()} />
+          <Route exact path="/" element={< MyContainer />} />
+          <Route path="/about" element={<About />} />
         </Routes>
       </div>
     </Router>

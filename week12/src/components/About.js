@@ -7,18 +7,15 @@ function About(){
 
     useEffect(() => {
         let isMounted = true;
-
-        async function fetchData() {
-            const data = await fetch('https://jsonplaceholder.typicode.com/posts').then(res => res.json()).catch(err => console.log(err));
-            console.log(data);
-
-            if(isMounted){
-                setItems(data);
-            }
-        }
-        fetchData();
-
-        return () => { isMounted = false; };
+        
+        fetch('https://jsonplaceholder.typicode.com/posts')
+        .then(res => res.json())
+        .then(data => {
+            console.log(data)
+            if(isMounted) setItems(data)})
+        .catch(err => console.log(err));
+        
+        return () => isMounted = false;
     }, []);
 
     return <>

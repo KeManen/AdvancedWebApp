@@ -13,8 +13,8 @@ function Header(){
             <Suspense fallback={<div>Loading...</div>}>
                 <Toolbar>
                     <ButtonGroup variant='text'>
-                        <Link element={About()} to="/about">{t("about")}</Link>
-                        <Link element={MyContainer()} to="/">{t("home")}</Link>
+                        <Link element={< About />} to="/about">{t("about")}</Link>
+                        <Link element={< MyContainer />} to="/">{t("home")}</Link>
                     </ButtonGroup>
                     <ButtonGroup variant='text'>
                         <Button id="en" onClick={() => i18n.changeLanguage('en')}>EN</Button>
