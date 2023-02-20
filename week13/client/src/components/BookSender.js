@@ -18,15 +18,15 @@ function BookSender() {
         <p>Book sender</p>
         <form method="post" onSubmit={sendHandler}>
             <label>
-                Name: <input type="text" name="name" />
+                Name: <input id="name" type="text" name="name" />
             </label>
             <label>
-                Author: <input type="text" name="author" />
+                Author: <input id="author" type="text" name="author" />
             </label>
             <label>
-                Pages: <input type="number" name="pages" />
+                Pages: <input id="pages" type="number" name="pages" />
             </label>
-            <button type="submit">Send</button>
+            <button id="submit" type="submit">Send</button>
         </form>
     </>
 }
